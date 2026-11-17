@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocabKids SD - Belajar & Kuis Kosakata Bahasa Inggris</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Nunito & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef9c3 50%, #dcfce7 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-display {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* Animasi Kustom */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.92); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Tombol 3D Playful */
+        .btn-3d {
+            transition: all 0.14s ease;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+        }
+        .btn-3d-blue {
+            background-color: #0ea5e9;
+            box-shadow: 0 4px 0 #0284c7;
+        }
+        .btn-3d-blue:hover:not(:disabled) { background-color: #38bdf8; }
+        .btn-3d-blue:active:not(:disabled) { box-shadow: 0 1px 0 #0284c7; }
+
+        .btn-3d-green {
+            background-color: #22c55e;
+            box-shadow: 0 4px 0 #16a34a;
+        }
+        .btn-3d-green:hover:not(:disabled) { background-color: #4ade80; }
+        .btn-3d-green:active:not(:disabled) { box-shadow: 0 1px 0 #16a34a; }
+
+        .btn-3d-amber {
+            background-color: #f59e0b;
+            box-shadow: 0 4px 0 #d97706;
+        }
+        .btn-3d-amber:hover:not(:disabled) { background-color: #fbbf24; }
+        .btn-3d-amber:active:not(:disabled) { box-shadow: 0 1px 0 #d97706; }
+
+        .btn-3d-purple {
+            background-color: #8b5cf6;
+            box-shadow: 0 4px 0 #6d28d9;
+        }
+        .btn-3d-purple:hover:not(:disabled) { background-color: #a78bfa; }
+        .btn-3d-purple:active:not(:disabled) { box-shadow: 0 1px 0 #6d28d9; }
+
+        /* Flip Card 3D untuk Flashcards */
+        .flip-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.25rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Tile Huruf Scramble */
+        .letter-tile {
+            transition: all 0.14s ease;
+            box-shadow: 0 4px 0 #cbd5e1;
+        }
+        .letter-tile:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #cbd5e1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col items-center min-h-screen p-2.5 sm:p-5">
+
+    <!-- Toast Notification (Pengganti alert) -->
+    <div id="toast-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 hidden transition-all duration-300 w-[92%] max-w-md">
+        <div class="bg-slate-800/95 backdrop-blur text-white px-4 py-3 rounded-2xl shadow-2xl font-semibold text-xs sm:text-sm flex items-center gap-2.5 border border-slate-700">
+            <span id="toast-icon" class="text-lg">💡</span>
+            <span id="toast-text" class="flex-1">Pesan notifikasi</span>
+        </div>
+    </div>
+
+    <!-- Modal Pengaturan Guru (Webhook Google Sheets) -->
+    <div id="teacher-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-4 border-sky-100 animate-pop">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-display font-black text-xl text-slate-800 flex items-center gap-2">
+                    <span>👩‍🏫</span> Pengaturan Guru (Opsional)
+                </h3>
+                <button onclick="toggleTeacherModal(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed">
+                Tempelkan <strong>URL Web App Google Apps Script</strong> di bawah ini jika ingin nilai kuis siswa otomatis terkirim ke Google Sheets Anda. Kosongkan jika tidak menggunakan webhook.
+            </p>
+            <label for="webhook-url-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                URL Webhook Google Sheets:
+            </label>
+            <input type="url" id="webhook-url-input" placeholder="https://script.google.com/macros/s/.../exec"
+                class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none text-xs sm:text-sm mb-4">
+            <div class="flex gap-2.5">
+                <button onclick="saveWebhookSetting()" class="flex-1 py-2.5 px-4 rounded-xl btn-3d btn-3d-blue text-white font-display font-extrabold text-sm">
+                    💾 Simpan Pengaturan
+                </button>
+                <button onclick="clearWebhookSetting()" class="py-2.5 px-3.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 font-display font-bold text-sm">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Utama -->
+    <main class="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-white overflow-hidden my-auto">
+
+        <!-- ========================================== -->
+        <!-- 1. PORTAL MASUK SISWA (LOGIN SCREEN)       -->
+        <!-- ========================================== -->
+        <section id="screen-login" class="p-6 sm:p-10 text-center animate-pop relative">
+            <!-- Tombol Pengaturan Guru di Pojok Kanan Atas -->
+            <button onclick="toggleTeacherModal(true)" title="Pengaturan Guru"
+                class="absolute top-4 right-4 sm:top-6 sm:right-6 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold flex items-center gap-1.5 transition">
+                <span>⚙️</span>
+                <span class="hidden sm:inline">Mode Guru</span>
+                <span id="webhook-indicator" class="w-2 h-2 rounded-full bg-slate-300"></span>
+            </button>
+
+            <div class="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-sky-100 text-4xl sm:text-5xl mb-3 animate-float shadow-inner border-4 border-sky-200">
+                🚀
+            </div>
+            <div>
+                <span class="inline-block bg-amber-100 text-amber-800 font-display font-extrabold text-xs px-3.5 py-1 rounded-full uppercase tracking-wider mb-2">
+                    Kurikulum Merdeka • Bahasa Inggris SD
+                </span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-sky-600 mb-2">
+                VocabKids Explorer
+            </h1>
+            <p class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto mb-6">
+                Belajar <strong>65 kosakata penting</strong> lewat kartu pintar bersuara dan uji kemampuanmu di <strong>30 tantangan kuis interaktif</strong>! 🌟
+            </p>
+
+            <!-- Form Identitas Siswa -->
+            <div class="bg-sky-50/90 border-2 border-sky-100 rounded-2xl p-5 sm:p-6 text-left max-w-md mx-auto mb-6">
+                <div>
+                    <label for="student-name" class="block font-display font-bold text-slate-700 mb-1.5 text-sm">
+                        ✍️ Nama Lengkap Siswa:
+                    </label>
+                    <input type="text" id="student-name" placeholder="Ketik nama lengkapmu di sini..." maxlength="45"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-sky-200 focus:border-sky-500 focus:outline-none bg-white font-semibold text-slate-800 text-sm sm:text-base transition">
+                </div>
+            </div>
+
+            <!-- Pilihan Masuk Langsung -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
+                <button onclick="enterApp('learn')"
+                    class="py-3.5 px-5 rounded-2xl btn-3d btn-3d-amber text-white font-display font-black text-base flex items-center justify-center gap-2">
+                    <span>📚</span>
+                    <span>Belajar Materi Dulu</span>
+                </button>
+                <button onclick="enterApp('quiz-menu')"
+                    class="py-3.5 px-5 rounded-2xl btn-3d btn-3d-blue text-white font-display font-black text-base flex items-center justify-center gap-2">
+                    <span>🎮</span>
+                    <span>Langsung Kuis</span>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- 2. DASHBOARD UTAMA (NAVIGASI TAB)          -->
+        <!-- ========================================== -->
+        <section id="screen-app" class="hidden flex flex-col">
+            <!-- Header Bar Siswa & Navigasi Utama -->
+            <header class="bg-sky-600 text-white p-3.5 sm:px-6 sm:py-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg">👦</div>
+                        <div>
+                            <div id="header-student-name" class="font-display font-black text-sm sm:text-base leading-tight">Nama Siswa</div>
+                            <div class="text-xs text-sky-200 font-semibold">Bahasa Inggris SD • Kurikulum Merdeka</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleSoundEffects()" id="btn-sfx-toggle" title="Efek Suara"
+                            class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold flex items-center gap-1 transition">
+                            <span id="sfx-icon">🔔</span>
+                            <span class="hidden sm:inline" id="sfx-label">Suara On</span>
+                        </button>
+                        <button onclick="logoutStudent()"
+                            class="px-3 py-1.5 rounded-xl bg-rose-500/80 hover:bg-rose-500 text-xs font-bold transition">
+                            Ganti Siswa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigasi 3 Tab Utama -->
+                <nav class="grid grid-cols-3 gap-2 bg-sky-700/60 p-1.5 rounded-2xl">
+                    <button onclick="switchMainTab('learn')" id="tab-btn-learn"
+                        class="main-tab-btn py-2.5 px-2 rounded-xl font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition bg-white text-sky-700 shadow">
+                        <span>📚</span>
+                        <span>Materi & Flashcard</span>
+                    </button>
+                    <button onclick="switchMainTab('quiz')" id="tab-btn-quiz"
+                        class="main-tab-btn py-2.5 px-2 rounded-xl font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition text-sky-100 hover:bg-white/10">
+                        <span>🎯</span>
+                        <span>Bank Kuis (30)</span>
+                    </button>
+                    <button onclick="switchMainTab('report')" id="tab-btn-report"
+                        class="main-tab-btn py-2.5 px-2 rounded-xl font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition text-sky-100 hover:bg-white/10">
+                        <span>📊</span>
+                        <span>Rapor & Hasil</span>
+                    </button>
+                </nav>
+            </header>
+
+            <!-- ========================================== -->
+            <!-- TAB A: MODUL MATERI & FLASHCARDS (5 TEMA)  -->
+            <!-- ========================================== -->
+            <div id="tab-content-learn" class="p-4 sm:p-6">
+                <!-- Pilihan 5 Tema Kurikulum -->
+                <div class="mb-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="font-display font-black text-base sm:text-lg text-slate-800">
+                            Pilih Tema Kosakata (65 Kata):
+                        </h2>
+                        <span id="theme-word-count" class="text-xs font-bold bg-sky-100 text-sky-700 px-2.5 py-1 rounded-full">
+                            13 Kosakata
+                        </span>
+                    </div>
+                    <div id="theme-selector" class="flex gap-2 overflow-x-auto pb-2">
+                        <!-- Diisi otomatis oleh JS -->
+                    </div>
+                </div>
+
+                <!-- Header Tema Aktif & Sub-Mode (Flashcard vs Mini-Practice) -->
+                <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 id="active-theme-title" class="font-display font-black text-lg sm:text-xl text-amber-900">
+                            Tema 1: Daily Routines & School
+                        </h3>
+                        <p id="active-theme-desc" class="text-xs sm:text-sm text-amber-800/80">
+                            Klik kartu di bawah untuk membalik dan melihat arti serta contoh kalimatnya!
+                        </p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="switchLearnSubMode('cards')" id="submode-btn-cards"
+                            class="px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm bg-amber-500 text-white shadow">
+                            🃏 Kartu Kata
+                        </button>
+                        <button onclick="switchLearnSubMode('mini')" id="submode-btn-mini"
+                            class="px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm bg-white text-amber-800 border border-amber-300 hover:bg-amber-100">
+                            ⚡ Latihan Kilat (5)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sub-Mode 1: Grid Flashcards Interaktif -->
+                <div id="learn-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Kartu Flashcard diisi oleh JS -->
+                </div>
+
+                <!-- Sub-Mode 2: Mini-Practice per Tema (5 Soal Cepat) -->
+                <div id="learn-mini-container" class="hidden max-w-xl mx-auto">
+                    <div class="bg-white border-2 border-sky-200 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-sky-600 bg-sky-50 px-3 py-1 rounded-full">
+                                ⚡ Latihan Kilat Tema Ini
+                            </span>
+                            <span id="mini-progress" class="font-display font-black text-sm text-slate-500">Soal 1 / 5</span>
+                        </div>
+                        <div id="mini-quiz-body">
+                            <!-- Konten mini quiz diisi JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB B: BANK LATIHAN SOAL KOMPREHENSIF (30) -->
+            <!-- ========================================== -->
+            <div id="tab-content-quiz" class="hidden p-4 sm:p-6">
+                <!-- Layar Pemilihan Paket Kuis -->
+                <div id="quiz-lobby" class="max-w-2xl mx-auto text-center py-3 animate-pop">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-100 text-3xl mb-3">
+                        🏆
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-display font-black text-slate-800 mb-2">
+                        Pilih Paket Tantangan Kuis
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 mb-6 max-w-lg mx-auto">
+                        Semua soal mencakup 5 tema kurikulum dengan 4 variasi permainan: <strong>Tebak Gambar & Audio</strong>, <strong>Arti & Lawan Kata</strong>, <strong>Kalimat Rumpang</strong>, dan <strong>Susun Huruf</strong>.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-left mb-6">
+                        <!-- Paket A -->
+                        <div class="border-2 border-emerald-200 bg-emerald-50/60 rounded-2xl p-4 flex flex-col justify-between">
+                            <div>
+                                <span class="inline-block bg-emerald-500 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full mb-2">Paket A</span>
+                                <h3 class="font-display font-black text-lg text-emerald-950">15 Soal Dasar</h3>
+                                <p class="text-xs text-emerald-800 mt-1 mb-4">
+                                    Cocok untuk pemanasan! Fokus pada pengenalan benda, makanan, tubuh, dan arti dasar.
+                                </p>
+                            </div>
+                            <button onclick="startMainQuiz('paketA')"
+                                class="w-full py-2.5 px-3 rounded-xl btn-3d btn-3d-green text-white font-display font-extrabold text-sm">
+                                Mulai Paket A ▶️
+                            </button>
+                        </div>
+
+                        <!-- Paket B -->
+                        <div class="border-2 border-purple-200 bg-purple-50/60 rounded-2xl p-4 flex flex-col justify-between">
+                            <div>
+                                <span class="inline-block bg-purple-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full mb-2">Paket B</span>
+                                <h3 class="font-display font-black text-lg text-purple-950">15 Soal Tantangan</h3>
+                                <p class="text-xs text-purple-800 mt-1 mb-4">
+                                    Lebih menantang! Lebih banyak kalimat kontekstual, lawan kata, dan susun huruf.
+                                </p>
+                            </div>
+                            <button onclick="startMainQuiz('paketB')"
+                                class="w-full py-2.5 px-3 rounded-xl btn-3d btn-3d-purple text-white font-display font-extrabold text-sm">
+                                Mulai Paket B ▶️
+                            </button>
+                        </div>
+
+                        <!-- Paket Komprehensif (30 Soal) -->
+                        <div class="border-2 border-sky-300 bg-sky-50/90 rounded-2xl p-4 flex flex-col justify-between relative shadow-md">
+                            <span class="absolute -top-2.5 right-3 bg-amber-400 text-amber-950 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Rekomendasi</span>
+                            <div>
+                                <span class="inline-block bg-sky-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full mb-2">Lengkap</span>
+                                <h3 class="font-display font-black text-lg text-sky-950">Semua 30 Soal</h3>
+                                <p class="text-xs text-sky-800 mt-1 mb-4">
+                                    Ujian komprehensif seluruh 5 tema untuk mengukur pemetaan nilai rapor secara utuh!
+                                </p>
+                            </div>
+                            <button onclick="startMainQuiz('all')"
+                                class="w-full py-2.5 px-3 rounded-xl btn-3d btn-3d-blue text-white font-display font-extrabold text-sm">
+                                Mulai 30 Soal 🚀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arena Pengerjaan Kuis Aktif -->
+                <div id="quiz-arena" class="hidden max-w-2xl mx-auto">
+                    <!-- Bar Status Kuis -->
+                    <div class="bg-slate-100 rounded-2xl p-3.5 mb-5">
+                        <div class="flex items-center justify-between text-xs sm:text-sm font-bold mb-2">
+                            <span id="quiz-mode-label" class="text-sky-700">Paket Lengkap (30 Soal)</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-slate-600">⏱️ <span id="quiz-timer">00:00</span></span>
+                                <span class="bg-amber-400 text-amber-950 px-2.5 py-0.5 rounded-full font-display font-black">
+                                    ⭐ <span id="quiz-live-score">0</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                                <div id="quiz-progress-bar" class="bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 5%"></div>
+                            </div>
+                            <span id="quiz-counter" class="font-display font-black text-xs text-slate-600 whitespace-nowrap">1 / 30</span>
+                        </div>
+                    </div>
+
+                    <!-- Info Tipe & Tema Soal -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span id="q-type-badge" class="px-3 py-1 rounded-full text-xs font-display font-extrabold bg-amber-100 text-amber-800">
+                            🖼️ Tebak Gambar & Audio
+                        </span>
+                        <span id="q-theme-badge" class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                            Tema: Daily Routines
+                        </span>
+                    </div>
+
+                    <!-- Pertanyaan -->
+                    <h3 id="q-instruction" class="text-base sm:text-xl font-display font-extrabold text-slate-800 mb-4">
+                        Instruksi soal di sini
+                    </h3>
+
+                    <!-- Kotak Visual / Audio / Kalimat -->
+                    <div id="q-prompt-box" class="bg-slate-50 border-2 border-slate-200/80 rounded-2xl p-5 mb-5 text-center">
+                        <!-- Diisi oleh JS -->
+                    </div>
+
+                    <!-- Area Interaksi Jawaban -->
+                    <div id="q-answer-area">
+                        <!-- Diisi oleh JS -->
+                    </div>
+
+                    <!-- Kotak Feedback Instan -->
+                    <div id="q-feedback-box" class="hidden mt-5 p-4 sm:p-5 rounded-2xl border-2 animate-pop">
+                        <div class="flex items-start gap-3">
+                            <div id="q-fb-icon" class="text-3xl">🎉</div>
+                            <div class="flex-1">
+                                <h4 id="q-fb-title" class="font-display font-black text-base sm:text-lg">Benar!</h4>
+                                <p id="q-fb-desc" class="text-xs sm:text-sm mt-1 font-medium"></p>
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <button type="button" onclick="speakCurrentQuizWord(1.0)"
+                                        class="inline-flex items-center gap-1.5 bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1.5 rounded-xl font-display font-bold text-xs shadow-sm">
+                                        <span>🔊</span> Dengarkan (<span id="q-fb-word">Word</span>)
+                                    </button>
+                                    <button type="button" onclick="speakCurrentQuizWord(0.65)"
+                                        class="inline-flex items-center gap-1.5 bg-white hover:bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-xl font-display font-bold text-xs shadow-sm">
+                                        <span>🐢</span> Pelan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="q-next-btn" onclick="nextMainQuestion()"
+                            class="mt-4 w-full py-3.5 px-5 rounded-xl btn-3d btn-3d-blue text-white font-display font-extrabold text-sm sm:text-base flex items-center justify-center gap-2">
+                            <span>Soal Berikutnya</span>
+                            <span>➡️</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB C: LAPORAN RAPOR & ANALISIS PEMAHAMAN  -->
+            <!-- ========================================== -->
+            <div id="tab-content-report" class="hidden p-4 sm:p-6">
+                <!-- Kondisi jika belum mengerjakan kuis -->
+                <div id="report-empty-state" class="text-center py-12 max-w-md mx-auto">
+                    <div class="text-6xl mb-3">📋</div>
+                    <h3 class="font-display font-black text-xl text-slate-800 mb-2">Belum Ada Hasil Kuis</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 mb-5">
+                        Kamu belum menyelesaikan sesi kuis. Yuk kerjakan kuis terlebih dahulu untuk melihat grafik penguasaan kosakatamu!
+                    </p>
+                    <button onclick="switchMainTab('quiz')"
+                        class="py-3 px-6 rounded-2xl btn-3d btn-3d-blue text-white font-display font-extrabold text-sm">
+                        Mulai Kuis Sekarang 🎯
+                    </button>
+                </div>
+
+                <!-- Konten Rapor Lengkap -->
+                <div id="report-filled-state" class="hidden max-w-3xl mx-auto animate-pop">
+                    <!-- Banner Predikat & Skor -->
+                    <div class="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white rounded-3xl p-5 sm:p-6 mb-6 shadow-lg">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                            <div class="flex flex-col sm:flex-row items-center gap-4">
+                                <div id="rep-badge-icon" class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-5xl shadow-inner">
+                                    🏆
+                                </div>
+                                <div>
+                                    <div id="rep-stars" class="text-2xl tracking-widest mb-0.5">⭐⭐⭐</div>
+                                    <h2 id="rep-predicate" class="text-2xl sm:text-3xl font-display font-black">Master Explorer!</h2>
+                                    <p id="rep-student-meta" class="text-xs sm:text-sm text-sky-100 font-medium mt-0.5">
+                                        Siswa • Paket Lengkap
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur rounded-2xl px-5 py-3 text-center border border-white/20 shrink-0">
+                                <div class="text-[11px] uppercase tracking-wider font-bold text-sky-100">Nilai Akhir</div>
+                                <div class="text-4xl font-display font-black">
+                                    <span id="rep-score">0</span><span class="text-lg text-sky-200">/100</span>
+                                </div>
+                                <div id="rep-stats-sub" class="text-xs text-sky-100 mt-0.5">0/0 Benar • 00:00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grafik Analisis Penguasaan per 5 Tema -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                        <div class="bg-slate-50 border-2 border-slate-200/80 rounded-2xl p-4 sm:p-5">
+                            <h3 class="font-display font-extrabold text-slate-800 text-base mb-3 flex items-center gap-2">
+                                <span>📈</span> Penguasaan per Tema Materi
+                            </h3>
+                            <div id="rep-theme-bars" class="space-y-3">
+                                <!-- Diisi JS -->
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 border-2 border-slate-200/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-display font-extrabold text-slate-800 text-base mb-3 flex items-center gap-2">
+                                    <span>🧩</span> Penguasaan per Tipe Kemampuan
+                                </h3>
+                                <div id="rep-type-bars" class="space-y-3 mb-4">
+                                    <!-- Diisi JS -->
+                                </div>
+                            </div>
+                            <div id="rep-recommendation" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-medium leading-relaxed">
+                                <!-- Rekomendasi belajar -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi Rapor -->
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <button onclick="copyReportToClipboard()"
+                            class="flex-1 min-w-[200px] py-3.5 px-4 rounded-2xl btn-3d btn-3d-green text-white font-display font-extrabold text-sm flex items-center justify-center gap-2">
+                            <span>📋</span>
+                            <span>Salin Laporan Rapor (WhatsApp)</span>
+                        </button>
+                        <button id="btn-send-webhook" onclick="sendReportToWebhook()"
+                            class="hidden flex-1 min-w-[200px] py-3.5 px-4 rounded-2xl btn-3d btn-3d-purple text-white font-display font-extrabold text-sm flex items-center justify-center gap-2">
+                            <span>☁️</span>
+                            <span>Kirim ke Google Sheets Guru</span>
+                        </button>
+                        <button onclick="switchMainTab('quiz')"
+                            class="py-3.5 px-5 rounded-2xl btn-3d btn-3d-blue text-white font-display font-extrabold text-sm flex items-center justify-center gap-2">
+                            <span>🔄</span>
+                            <span>Ulangi Kuis</span>
+                        </button>
+                    </div>
+
+                    <!-- Review Pembahasan Soal -->
+                    <div class="bg-white border-2 border-slate-200/80 rounded-2xl p-4 sm:p-5">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <h3 class="font-display font-extrabold text-slate-800 text-base flex items-center gap-2">
+                                <span>🔍</span> Review Pembahasan Jawaban
+                            </h3>
+                            <div class="flex gap-1.5 text-xs">
+                                <button onclick="filterReviewList('wrong')" id="rev-filter-wrong"
+                                    class="px-3 py-1 rounded-lg font-bold bg-rose-100 text-rose-800">
+                                    Perlu Diperbaiki (<span id="wrong-count-badge">0</span>)
+                                </button>
+                                <button onclick="filterReviewList('all')" id="rev-filter-all"
+                                    class="px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-600">
+                                    Semua Soal
+                                </button>
+                            </div>
+                        </div>
+                        <div id="rep-review-list" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                            <!-- Diisi JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="mt-4 mb-2 text-center text-xs text-slate-500 font-medium">
+        VocabKids Explorer • Media Pembelajaran & Asesmen Bahasa Inggris SD (Kurikulum Merdeka)
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- LOGIKA JAVASCRIPT & BANK DATA              -->
+    <!-- ========================================== -->
+    <script>
+        // =========================================================================
+        // 1. DATABASE MATERI KOSAKATA (5 TEMA KURIKULUM MERDEKA - TOTAL 65 KATA)
+        // =========================================================================
+        const curriculumThemes = [
+            {
+                id: 'routines',
+                shortTitle: '1. Daily & School',
+                title: 'Tema 1: Daily Routines & School Activities',
+                icon: '🏫',
+                color: 'sky',
+                description: 'Kosakata kegiatan sehari-hari di rumah dan aktivitas belajar di sekolah.',
+                words: [
+                    { en: 'Wake up', phonetic: '/weɪk ʌp/', id: 'Bangun tidur', emoji: '⏰', exampleEn: 'I wake up at five o’clock every morning.', exampleId: 'Aku bangun tidur pukul lima setiap pagi.' },
+                    { en: 'Take a bath', phonetic: '/teɪk ə bæθ/', id: 'Mandi', emoji: '🛁', exampleEn: 'I take a bath before going to school.', exampleId: 'Aku mandi sebelum pergi ke sekolah.' },
+                    { en: 'Brush teeth', phonetic: '/brʌʃ tiːθ/', id: 'Menggosok gigi', emoji: '🪥', exampleEn: 'Don’t forget to brush your teeth after dinner.', exampleId: 'Jangan lupa menggosok gigimu setelah makan malam.' },
+                    { en: 'Have breakfast', phonetic: '/hæv ˈbrɛkfəst/', id: 'Sarapan pagi', emoji: '🥞', exampleEn: 'We have breakfast together in the dining room.', exampleId: 'Kami sarapan pagi bersama di ruang makan.' },
+                    { en: 'Go to school', phonetic: '/ɡoʊ tu skuːl/', id: 'Pergi ke sekolah', emoji: '🎒', exampleEn: 'Siti and Budi go to school on foot.', exampleId: 'Siti dan Budi pergi ke sekolah berjalan kaki.' },
+                    { en: 'Study', phonetic: '/ˈstʌdi/', id: 'Belajar', emoji: '📖', exampleEn: 'We study English every Tuesday and Thursday.', exampleId: 'Kami belajar Bahasa Inggris setiap Selasa dan Kamis.' },
+                    { en: 'Write', phonetic: '/raɪt/', id: 'Menulis', emoji: '✍️', exampleEn: 'Please write your name on the paper.', exampleId: 'Tolong tulis namamu di atas kertas.' },
+                    { en: 'Listen', phonetic: '/ˈlɪsən/', id: 'Mendengarkan', emoji: '👂', exampleEn: 'The students listen to the teacher carefully.', exampleId: 'Para siswa mendengarkan guru dengan saksama.' },
+                    { en: 'Library', phonetic: '/ˈlaɪbrɛri/', id: 'Perpustakaan', emoji: '📚', exampleEn: 'Rina borrows a storybook from the library.', exampleId: 'Rina meminjam buku cerita dari perpustakaan.' },
+                    { en: 'Blackboard', phonetic: '/ˈblækbɔːrd/', id: 'Papan tulis', emoji: '🧑‍🏫', exampleEn: 'The teacher writes the lesson on the blackboard.', exampleId: 'Guru menulis pelajaran di papan tulis.' },
+                    { en: 'Uniform', phonetic: '/ˈjuːnɪfɔːrm/', id: 'Seragam sekolah', emoji: '👔', exampleEn: 'Indonesian students wear red and white uniforms.', exampleId: 'Siswa Indonesia memakai seragam merah putih.' },
+                    { en: 'Homework', phonetic: '/ˈhoʊmwɜːrk/', id: 'Pekerjaan rumah (PR)', emoji: '📝', exampleEn: 'I always do my homework in the evening.', exampleId: 'Aku selalu mengerjakan PR-ku di malam hari.' },
+                    { en: 'Flag ceremony', phonetic: '/flæɡ ˈsɛrəmoʊni/', id: 'Upacara bendera', emoji: '🇮🇩', exampleEn: 'We have a flag ceremony every Monday morning.', exampleId: 'Kami melaksanakan upacara bendera setiap Senin pagi.' }
+                ]
+            },
+            {
+                id: 'food',
+                shortTitle: '2. Food & Tastes',
+                title: 'Tema 2: Food, Drinks & Tastes',
+                icon: '🍎',
+                color: 'emerald',
+                description: 'Kosakata makanan, minuman, buah, sayur, dan berbagai macam rasa.',
+                words: [
+                    { en: 'Sweet', phonetic: '/swiːt/', id: 'Manis', emoji: '🍭', exampleEn: 'Honey and candy taste very sweet.', exampleId: 'Madu dan permen rasanya sangat manis.' },
+                    { en: 'Sour', phonetic: '/ˈsaʊər/', id: 'Asam / Kecut', emoji: '🍋', exampleEn: 'Lemons and green mangoes are sour.', exampleId: 'Lemon dan mangga muda rasanya asam.' },
+                    { en: 'Salty', phonetic: '/ˈsɔːlti/', id: 'Asin', emoji: '🧂', exampleEn: 'The ocean water and potato chips are salty.', exampleId: 'Air laut dan keripik kentang rasanya asin.' },
+                    { en: 'Spicy', phonetic: '/ˈspaɪsi/', id: 'Pedas', emoji: '🌶️', exampleEn: 'My mother likes spicy chili sauce.', exampleId: 'Ibuku suka sambal yang pedas.' },
+                    { en: 'Bitter', phonetic: '/ˈbɪtər/', id: 'Pahit', emoji: '☕', exampleEn: 'Black coffee without sugar tastes bitter.', exampleId: 'Kopi hitam tanpa gula rasanya pahit.' },
+                    { en: 'Fried rice', phonetic: '/fraɪd raɪs/', id: 'Nasi goreng', emoji: '🍛', exampleEn: 'Fried rice is my favorite Indonesian food.', exampleId: 'Nasi goreng adalah makanan Indonesia favoritku.' },
+                    { en: 'Noodles', phonetic: '/ˈnuːdəlz/', id: 'Mi', emoji: '🍜', exampleEn: 'Edo eats a bowl of hot chicken noodles.', exampleId: 'Edo makan semangkuk mi ayam hangat.' },
+                    { en: 'Bread', phonetic: '/brɛd/', id: 'Roti', emoji: '🍞', exampleEn: 'I eat two slices of bread with jam.', exampleId: 'Aku makan dua lembar roti dengan selai.' },
+                    { en: 'Milk', phonetic: '/mɪlk/', id: 'Susu', emoji: '🥛', exampleEn: 'Drinking milk makes our bones strong.', exampleId: 'Minum susu membuat tulang kita kuat.' },
+                    { en: 'Orange juice', phonetic: '/ˈɔːrɪndʒ dʒuːs/', id: 'Jus jeruk', emoji: '🧃', exampleEn: 'I want a glass of cold orange juice.', exampleId: 'Aku ingin segelas jus jeruk dingin.' },
+                    { en: 'Watermelon', phonetic: '/ˈwɔːtərmɛlən/', id: 'Semangka', emoji: '🍉', exampleEn: 'Watermelon is red inside and very juicy.', exampleId: 'Semangka berwarna merah di dalam dan berair.' },
+                    { en: 'Carrot', phonetic: '/ˈkærət/', id: 'Wortel', emoji: '🥕', exampleEn: 'Rabbits love eating fresh orange carrots.', exampleId: 'Kelinci suka makan wortel oranye yang segar.' },
+                    { en: 'Hungry', phonetic: '/ˈhʌŋɡri/', id: 'Lapar', emoji: '🍽️', exampleEn: 'I am hungry, let’s go to the canteen.', exampleId: 'Aku lapar, ayo kita pergi ke kantin.' }
+                ]
+            },
+            {
+                id: 'body',
+                shortTitle: '3. Body & Health',
+                title: 'Tema 3: Parts of Body & Health',
+                icon: '🩺',
+                color: 'rose',
+                description: 'Mengenal anggota tubuh manusia dan keluhan kesehatan ringan sehari-hari.',
+                words: [
+                    { en: 'Head', phonetic: '/hɛd/', id: 'Kepala', emoji: '🗣️', exampleEn: 'We wear a helmet to protect our head.', exampleId: 'Kita memakai helm untuk melindungi kepala.' },
+                    { en: 'Eyes', phonetic: '/aɪz/', id: 'Mata', emoji: '👀', exampleEn: 'We use our eyes to see the beautiful world.', exampleId: 'Kita menggunakan mata untuk melihat dunia yang indah.' },
+                    { en: 'Ears', phonetic: '/ɪərz/', id: 'Telinga', emoji: '👂', exampleEn: 'We have two ears to listen to music.', exampleId: 'Kita punya dua telinga untuk mendengarkan musik.' },
+                    { en: 'Nose', phonetic: '/noʊz/', id: 'Hidung', emoji: '👃', exampleEn: 'We smell fragrant flowers with our nose.', exampleId: 'Kita mencium bunga yang harum dengan hidung.' },
+                    { en: 'Stomach', phonetic: '/ˈstʌmək/', id: 'Perut', emoji: '🫃', exampleEn: 'Food goes into our stomach when we eat.', exampleId: 'Makanan masuk ke perut kita saat kita makan.' },
+                    { en: 'Toothache', phonetic: '/ˈtuːθeɪk/', id: 'Sakit gigi', emoji: '🦷', exampleEn: 'He has a toothache because he eats too much candy.', exampleId: 'Dia sakit gigi karena makan terlalu banyak permen.' },
+                    { en: 'Headache', phonetic: '/ˈhɛdeɪk/', id: 'Sakit kepala / Pusing', emoji: '🤕', exampleEn: 'Siti has a headache and needs to rest.', exampleId: 'Siti sakit kepala dan perlu beristirahat.' },
+                    { en: 'Stomachache', phonetic: '/ˈstʌməkeɪk/', id: 'Sakit perut', emoji: '🤢', exampleEn: 'Don’t eat spicy food if you have a stomachache.', exampleId: 'Jangan makan pedas jika kamu sedang sakit perut.' },
+                    { en: 'Fever', phonetic: '/ˈfiːvər/', id: 'Demam (panas)', emoji: '🤒', exampleEn: 'His body is very hot because he has a fever.', exampleId: 'Badannya sangat panas karena dia mengalami demam.' },
+                    { en: 'Cough', phonetic: '/kɔːf/', id: 'Batuk', emoji: '😷', exampleEn: 'Cover your mouth when you have a cough.', exampleId: 'Tutup mulutmu saat kamu sedang batuk.' },
+                    { en: 'Doctor', phonetic: '/ˈdɑːktər/', id: 'Dokter', emoji: '👨‍⚕️', exampleEn: 'The doctor examines the sick patient.', exampleId: 'Dokter memeriksa pasien yang sedang sakit.' },
+                    { en: 'Hospital', phonetic: '/ˈhɑːspɪtl/', id: 'Rumah sakit', emoji: '🏥', exampleEn: 'My aunt works as a nurse in the hospital.', exampleId: 'Bibiku bekerja sebagai perawat di rumah sakit.' },
+                    { en: 'Medicine', phonetic: '/ˈmɛdɪsɪn/', id: 'Obat', emoji: '💊', exampleEn: 'Take your medicine three times a day.', exampleId: 'Minum obatmu tiga kali sehari.' }
+                ]
+            },
+            {
+                id: 'weather',
+                shortTitle: '4. Clothes & Weather',
+                title: 'Tema 4: Clothes, Weather & Seasons',
+                icon: '🌦️',
+                color: 'amber',
+                description: 'Kosakata pakaian yang kita kenakan sesuai dengan kondisi cuaca dan musim.',
+                words: [
+                    { en: 'Sunny', phonetic: '/ˈsʌni/', id: 'Cerah (bermatahari)', emoji: '☀️', exampleEn: 'It is a sunny day, let’s play in the park!', exampleId: 'Hari ini cerah, ayo bermain di taman!' },
+                    { en: 'Rainy', phonetic: '/ˈreɪni/', id: 'Hujan', emoji: '🌧️', exampleEn: 'Bring your umbrella because it is rainy.', exampleId: 'Bawa payungmu karena cuaca sedang hujan.' },
+                    { en: 'Cloudy', phonetic: '/ˈklaʊdi/', id: 'Berawan / Mendung', emoji: '☁️', exampleEn: 'The sky looks dark and cloudy today.', exampleId: 'Langit terlihat gelap dan mendung hari ini.' },
+                    { en: 'Windy', phonetic: '/ˈwɪndi/', id: 'Berangin', emoji: '🌬️', exampleEn: 'It is windy, a great time to fly a kite.', exampleId: 'Cuaca berangin, waktu yang pas menerbangkan layangan.' },
+                    { en: 'Dry season', phonetic: '/draɪ ˈsiːzən/', id: 'Musim kemarau', emoji: '🏜️', exampleEn: 'Indonesia has two seasons: dry and rainy seasons.', exampleId: 'Indonesia punya dua musim: musim kemarau dan hujan.' },
+                    { en: 'Winter', phonetic: '/ˈwɪntər/', id: 'Musim dingin (salju)', emoji: '⛄', exampleEn: 'People wear thick coats in winter.', exampleId: 'Orang-orang memakai mantel tebal di musim dingin.' },
+                    { en: 'T-shirt', phonetic: '/ˈtiː ʃɜːrt/', id: 'Kaos oblong', emoji: '👕', exampleEn: 'I wear a cotton T-shirt when the weather is hot.', exampleId: 'Aku memakai kaos katun saat cuaca panas.' },
+                    { en: 'Trousers', phonetic: '/ˈtraʊzərz/', id: 'Celana panjang', emoji: '👖', exampleEn: 'Father wears black trousers to the office.', exampleId: 'Ayah memakai celana panjang hitam ke kantor.' },
+                    { en: 'Jacket', phonetic: '/ˈdʒækɪt/', id: 'Jaket', emoji: '🧥', exampleEn: 'Wear your jacket, it is cold outside.', exampleId: 'Pakai jaketmu, di luar udara dingin.' },
+                    { en: 'Raincoat', phonetic: '/ˈreɪnkoʊt/', id: 'Jas hujan', emoji: '☔', exampleEn: 'Motorcyclists wear raincoats when it rains.', exampleId: 'Pengendara motor memakai jas hujan saat hujan.' },
+                    { en: 'Hat', phonetic: '/hæt/', id: 'Topi', emoji: '🧢', exampleEn: 'She wears a hat to protect her face from the sun.', exampleId: 'Dia memakai topi untuk melindungi wajah dari matahari.' },
+                    { en: 'Shoes', phonetic: '/ʃuːz/', id: 'Sepatu', emoji: '👟', exampleEn: 'Put on your shoes before going outside.', exampleId: 'Pakai sepatumu sebelum pergi keluar.' },
+                    { en: 'Socks', phonetic: '/sɑːks/', id: 'Kaus kaki', emoji: '🧦', exampleEn: 'I wear clean white socks with my school shoes.', exampleId: 'Aku memakai kaus kaki putih bersih dengan sepatu sekolah.' }
+                ]
+            },
+            {
+                id: 'places',
+                shortTitle: '5. Places & Hobbies',
+                title: 'Tema 5: Places, Transport & Hobbies',
+                icon: '🚲',
+                color: 'purple',
+                description: 'Tempat-tempat umum di kota, alat transportasi, dan berbagai hobi seru.',
+                words: [
+                    { en: 'Post office', phonetic: '/poʊst ˈɔːfɪs/', id: 'Kantor pos', emoji: '🏣', exampleEn: 'We send letters and parcels at the post office.', exampleId: 'Kita mengirim surat dan paket di kantor pos.' },
+                    { en: 'Police station', phonetic: '/pəˈliːs ˈsteɪʃən/', id: 'Kantor polisi', emoji: '🚓', exampleEn: 'The police officer works at the police station.', exampleId: 'Petugas polisi bekerja di kantor polisi.' },
+                    { en: 'Mosque', phonetic: '/mɑːsk/', id: 'Masjid', emoji: '🕌', exampleEn: 'Muslims pray together in the mosque.', exampleId: 'Umat Islam beribadah bersama di masjid.' },
+                    { en: 'Market', phonetic: '/ˈmɑːrkɪt/', id: 'Pasar', emoji: '🛒', exampleEn: 'Mother buys fresh vegetables at the market.', exampleId: 'Ibu membeli sayuran segar di pasar.' },
+                    { en: 'Airport', phonetic: '/ˈɛərpɔːrt/', id: 'Bandara', emoji: '🛫', exampleEn: 'Airplanes take off and land at the airport.', exampleId: 'Pesawat terbang lepas landas dan mendarat di bandara.' },
+                    { en: 'Bicycle', phonetic: '/ˈbaɪsɪkəl/', id: 'Sepeda', emoji: '🚲', exampleEn: 'Budi rides his bicycle around the neighborhood.', exampleId: 'Budi mengendarai sepedanya di sekitar lingkungan rumah.' },
+                    { en: 'Train', phonetic: '/treɪn/', id: 'Kereta api', emoji: '🚆', exampleEn: 'We travel to Bandung by fast train.', exampleId: 'Kami bepergian ke Bandung naik kereta cepat.' },
+                    { en: 'Ship', phonetic: '/ʃɪp/', id: 'Kapal laut', emoji: '🚢', exampleEn: 'A big ship sails across the deep ocean.', exampleId: 'Kapal besar berlayar melintasi samudra luas.' },
+                    { en: 'Swimming', phonetic: '/ˈswɪmɪŋ/', id: 'Berenang', emoji: '🏊', exampleEn: 'My hobby is swimming in the swimming pool.', exampleId: 'Hobiku adalah berenang di kolam renang.' },
+                    { en: 'Fishing', phonetic: '/ˈfɪʃɪŋ/', id: 'Memancing', emoji: '🎣', exampleEn: 'Grandfather goes fishing at the lake on Sundays.', exampleId: 'Kakek pergi memancing di danau pada hari Minggu.' },
+                    { en: 'Painting', phonetic: '/ˈpeɪntɪŋ/', id: 'Melukis', emoji: '🎨', exampleEn: 'Dayu likes painting mountains and beaches.', exampleId: 'Dayu suka melukis gunung dan pantai.' },
+                    { en: 'Gardening', phonetic: '/ˈɡɑːrdənɪŋ/', id: 'Berkebun', emoji: '🌻', exampleEn: 'Gardening makes our house yard green and fresh.', exampleId: 'Berkebun membuat halaman rumah kita hijau dan segar.' },
+                    { en: 'Reading', phonetic: '/ˈriːdɪŋ/', id: 'Membaca', emoji: '📕', exampleEn: 'Reading books gives us a lot of knowledge.', exampleId: 'Membaca buku memberi kita banyak pengetahuan.' }
+                ]
+            }
+        ];
+
+        // =========================================================================
+        // 2. BANK SOAL KOMPREHENSIF (30 SOAL - PAKET A [15] & PAKET B [15])
+        // =========================================================================
+        const fullQuizBank = [
+            // --- PAKET A: 15 SOAL DASAR (ID 1 - 15) ---
+            {
+                id: 1, paket: 'A', themeId: 'routines', themeName: 'Daily & School',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Dengarkan suara atau lihat gambar, lalu pilih kosakata yang tepat!',
+                emoji: '🪥', targetWord: 'Brush teeth',
+                options: ['Wash face', 'Brush teeth', 'Comb hair', 'Take a bath'],
+                explanation: '"Brush teeth" artinya menggosok gigi.'
+            },
+            {
+                id: 2, paket: 'A', themeId: 'food', themeName: 'Food & Tastes',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Pilih bahasa Inggris yang benar untuk gambar buah di bawah ini!',
+                emoji: '🍉', targetWord: 'Watermelon',
+                options: ['Pineapple', 'Strawberry', 'Watermelon', 'Coconut'],
+                explanation: '"Watermelon" artinya buah Semangka.'
+            },
+            {
+                id: 3, paket: 'A', themeId: 'body', themeName: 'Body & Health',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Keluhan sakit apakah yang ditunjukkan pada gambar di bawah ini?',
+                emoji: '🦷', targetWord: 'Toothache',
+                options: ['Headache', 'Toothache', 'Stomachache', 'Earache'],
+                explanation: '"Toothache" artinya sakit gigi (Tooth = gigi, ache = sakit).'
+            },
+            {
+                id: 4, paket: 'A', themeId: 'weather', themeName: 'Clothes & Weather',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Bagaimana kondisi cuaca pada gambar di bawah ini?',
+                emoji: '🌧️', targetWord: 'Rainy',
+                options: ['Sunny', 'Windy', 'Rainy', 'Snowy'],
+                explanation: '"Rainy" artinya hujan.'
+            },
+            {
+                id: 5, paket: 'A', themeId: 'places', themeName: 'Places & Hobbies',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Alat transportasi apakah yang ditunjukkan pada gambar?',
+                emoji: '🚆', targetWord: 'Train',
+                options: ['Ship', 'Airplane', 'Train', 'Bus'],
+                explanation: '"Train" artinya kereta api.'
+            },
+            {
+                id: 6, paket: 'A', themeId: 'food', themeName: 'Food & Tastes',
+                type: 'meaning', typeLabel: '📖 Arti & Lawan Kata',
+                instruction: 'Apa lawan kata (Opposite) dari kata di bawah ini?',
+                promptHighlight: 'Sweet (Manis) >< _______',
+                promptSub: 'Contoh rasa pada buah lemon atau cuka',
+                targetWord: 'Sour', correctOption: 'Sour',
+                options: ['Salty', 'Sour', 'Spicy', 'Delicious'],
+                explanation: 'Lawan kata Sweet (manis) pada rasa makanan adalah Sour (asam/kecut).'
+            },
+            {
+                id: 7, paket: 'A', themeId: 'routines', themeName: 'Daily & School',
+                type: 'meaning', typeLabel: '📖 Arti & Lawan Kata',
+                instruction: 'Apa arti dari frasa kegiatan di bawah ini dalam Bahasa Indonesia?',
+                promptHighlight: '"Flag ceremony"',
+                promptSub: 'Dilaksanakan setiap hari Senin pagi di sekolah',
+                targetWord: 'Flag ceremony', correctOption: 'Upacara bendera',
+                options: ['Kerja bakti', 'Upacara bendera', 'Pelajaran olahraga', 'Istirahat siang'],
+                explanation: '"Flag ceremony" artinya Upacara bendera (Flag = bendera).'
+            },
+            {
+                id: 8, paket: 'A', themeId: 'body', themeName: 'Body & Health',
+                type: 'meaning', typeLabel: '📖 Arti & Lawan Kata',
+                instruction: 'Pilih arti Bahasa Indonesia yang tepat untuk kata kesehatan berikut!',
+                promptHighlight: '"Fever"',
+                promptSub: 'Suhu tubuh terasa panas saat diukur termometer',
+                targetWord: 'Fever', correctOption: 'Demam',
+                options: ['Batuk', 'Pilek', 'Demam', 'Luka'],
+                explanation: '"Fever" artinya Demam.'
+            },
+            {
+                id: 9, paket: 'A', themeId: 'routines', themeName: 'Daily & School',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Lengkapi kalimat kegiatan sehari-hari di bawah ini!',
+                sentence: 'I like reading and borrowing storybooks at the school _______.',
+                sentenceId: '(Aku suka membaca dan meminjam buku cerita di _______ sekolah.)',
+                emoji: '📚', targetWord: 'library',
+                options: ['canteen', 'library', 'garden', 'parking lot'],
+                explanation: '"Library" artinya perpustakaan, tempat membaca dan meminjam buku.'
+            },
+            {
+                id: 10, paket: 'A', themeId: 'weather', themeName: 'Clothes & Weather',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Pilih nama pakaian yang tepat untuk melengkapi kalimat!',
+                sentence: 'It is very cold outside. Please wear your thick _______.',
+                sentenceId: '(Di luar sangat dingin. Tolong pakai _______ tebalmu.)',
+                emoji: '🧥', targetWord: 'jacket',
+                options: ['T-shirt', 'shorts', 'jacket', 'sandals'],
+                explanation: '"Jacket" (jaket) dipakai agar tubuh tetap hangat saat udara dingin.'
+            },
+            {
+                id: 11, paket: 'A', themeId: 'places', themeName: 'Places & Hobbies',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Lengkapi kalimat tentang tempat umum di bawah ini!',
+                sentence: 'My mother buys fresh fruits and vegetables at the _______.',
+                sentenceId: '(Ibuku membeli buah dan sayuran segar di _______.)',
+                emoji: '🛒', targetWord: 'market',
+                options: ['airport', 'market', 'bank', 'post office'],
+                explanation: '"Market" artinya pasar.'
+            },
+            {
+                id: 12, paket: 'A', themeId: 'routines', themeName: 'Daily & School',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak di bawah ini menjadi kata "Belajar"!',
+                emoji: '📖', clueId: 'Belajar', targetWord: 'STUDY',
+                scrambled: ['Y', 'S', 'D', 'T', 'U'],
+                explanation: 'Ejaan yang benar adalah S-T-U-D-Y (Study = Belajar).'
+            },
+            {
+                id: 13, paket: 'A', themeId: 'food', themeName: 'Food & Tastes',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak berikut menjadi kata "Roti" dalam Bahasa Inggris!',
+                emoji: '🍞', clueId: 'Roti', targetWord: 'BREAD',
+                scrambled: ['D', 'B', 'A', 'R', 'E'],
+                explanation: 'Ejaan yang benar adalah B-R-E-A-D (Bread = Roti).'
+            },
+            {
+                id: 14, paket: 'A', themeId: 'body', themeName: 'Body & Health',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak berikut menjadi kata "Perut" dalam Bahasa Inggris!',
+                emoji: '🫃', clueId: 'Perut', targetWord: 'STOMACH',
+                scrambled: ['M', 'S', 'O', 'T', 'H', 'C', 'A'],
+                explanation: 'Ejaan yang benar adalah S-T-O-M-A-C-H (Stomach = Perut).'
+            },
+            {
+                id: 15, paket: 'A', themeId: 'places', themeName: 'Places & Hobbies',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak ini menjadi kata "Sepeda" dalam Bahasa Inggris!',
+                emoji: '🚲', clueId: 'Sepeda', targetWord: 'BICYCLE',
+                scrambled: ['C', 'B', 'I', 'L', 'Y', 'E', 'C'],
+                explanation: 'Ejaan yang benar adalah B-I-C-Y-C-L-E (Bicycle = Sepeda).'
+            },
+
+            // --- PAKET B: 15 SOAL TANTANGAN (ID 16 - 30) ---
+            {
+                id: 16, paket: 'B', themeId: 'places', themeName: 'Places & Hobbies',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Dengarkan suara dan perhatikan gambar! Hobi apakah ini?',
+                emoji: '🌻', targetWord: 'Gardening',
+                options: ['Cooking', 'Gardening', 'Swimming', 'Singing'],
+                explanation: '"Gardening" artinya berkebun atau merawat tanaman.'
+            },
+            {
+                id: 17, paket: 'B', themeId: 'weather', themeName: 'Clothes & Weather',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Benda apakah yang digunakan saat cuaca hujan pada gambar ini?',
+                emoji: '☔', targetWord: 'Raincoat',
+                options: ['Uniform', 'Trousers', 'Raincoat', 'Sweater'],
+                explanation: '"Raincoat" artinya jas hujan.'
+            },
+            {
+                id: 18, paket: 'B', themeId: 'body', themeName: 'Body & Health',
+                type: 'picture', typeLabel: '🖼️ Tebak Gambar & Audio',
+                instruction: 'Benda apakah yang diminum pasien agar cepat sembuh?',
+                emoji: '💊', targetWord: 'Medicine',
+                options: ['Candy', 'Medicine', 'Vitamin juice', 'Soap'],
+                explanation: '"Medicine" artinya obat.'
+            },
+            {
+                id: 19, paket: 'B', themeId: 'weather', themeName: 'Clothes & Weather',
+                type: 'meaning', typeLabel: '📖 Arti & Lawan Kata',
+                instruction: 'Pilih lawan kata (Opposite) yang tepat untuk musim berikut!',
+                promptHighlight: 'Dry season (Musim kemarau) >< _______',
+                promptSub: 'Musim saat curah hujan tinggi di Indonesia',
+                targetWord: 'Rainy season', correctOption: 'Rainy season',
+                options: ['Sunny day', 'Rainy season', 'Hot weather', 'Cloudy sky'],
+                explanation: 'Lawan dari Dry season (musim kemarau) adalah Rainy season (musim hujan).'
+            },
+            {
+                id: 20, paket: 'B', themeId: 'food', themeName: 'Food & Tastes',
+                type: 'meaning', typeLabel: '📖 Arti & Lawan Kata',
+                instruction: 'Pilih pasangan rasa dan makanan yang PALING TEPAT!',
+                promptHighlight: '"Black coffee without sugar tastes _______."',
+                promptSub: 'Kopi hitam tanpa gula rasanya...',
+                targetWord: 'Bitter', correctOption: 'Bitter (Pahit)',
+                options: ['Sweet (Manis)', 'Salty (Asin)', 'Bitter (Pahit)', 'Sour (Asam)'],
+                explanation: 'Kopi hitam tanpa gula memiliki rasa pahit (Bitter).'
+            },
+            {
+                id: 21, paket: 'B', themeId: 'places', themeName: 'Places & Hobbies',
+                type: 'meaning', typeLabel: '📖 Arti & Lawan Kata',
+                instruction: 'Apa arti dari tempat umum berikut ini?',
+                promptHighlight: '"Post office"',
+                promptSub: 'Tempat mengirim surat dan paket pos',
+                targetWord: 'Post office', correctOption: 'Kantor pos',
+                options: ['Kantor polisi', 'Kantor pos', 'Stasiun kereta', 'Pelabuhan'],
+                explanation: '"Post office" artinya Kantor pos.'
+            },
+            {
+                id: 22, paket: 'B', themeId: 'routines', themeName: 'Daily & School',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Lengkapi kalimat tentang kewajiban siswa berikut!',
+                sentence: 'Every evening, I review my lessons and do my _______ before sleeping.',
+                sentenceId: '(Setiap malam, aku mengulang pelajaran dan mengerjakan _______ sebelum tidur.)',
+                emoji: '📝', targetWord: 'homework',
+                options: ['breakfast', 'homework', 'ceremony', 'holiday'],
+                explanation: '"Homework" artinya pekerjaan rumah (PR).'
+            },
+            {
+                id: 23, paket: 'B', themeId: 'food', themeName: 'Food & Tastes',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Lengkapi kalimat di bawah ini sesuai dengan situasi!',
+                sentence: 'Edo did not eat lunch today. Now his stomach hurts because he is very _______.',
+                sentenceId: '(Edo tidak makan siang hari ini. Sekarang perutnya sakit karena sangat _______.)',
+                emoji: '🍽️', targetWord: 'hungry',
+                options: ['thirsty', 'sleepy', 'hungry', 'full'],
+                explanation: '"Hungry" artinya lapar (belum makan).'
+            },
+            {
+                id: 24, paket: 'B', themeId: 'body', themeName: 'Body & Health',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Pilih kata yang tepat untuk melengkapi kalimat kesehatan ini!',
+                sentence: 'Siti eats too much spicy chili sauce. Now she has a _______.',
+                sentenceId: '(Siti makan terlalu banyak sambal pedas. Sekarang dia mengalami _______.)',
+                emoji: '🤢', targetWord: 'stomachache',
+                options: ['toothache', 'stomachache', 'earache', 'broken leg'],
+                explanation: 'Makan terlalu pedas dapat menyebabkan sakit perut (Stomachache).'
+            },
+            {
+                id: 25, paket: 'B', themeId: 'weather', themeName: 'Clothes & Weather',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Lengkapi kalimat tentang aktivitas dan cuaca berikut!',
+                sentence: 'Look at the trees moving! Today is very _______, let’s fly a kite in the field.',
+                sentenceId: '(Lihat pohon-pohon bergerak! Hari ini sangat _______, ayo main layangan di lapangan.)',
+                emoji: '🌬️', targetWord: 'windy',
+                options: ['rainy', 'windy', 'foggy', 'snowy'],
+                explanation: '"Windy" artinya berangin, cuaca yang pas untuk menerbangkan layang-layang.'
+            },
+            {
+                id: 26, paket: 'B', themeId: 'places', themeName: 'Places & Hobbies',
+                type: 'context', typeLabel: '✍️ Kalimat Rumpang',
+                instruction: 'Lengkapi kalimat tentang transportasi berikut ini!',
+                sentence: 'We go to the _______ to catch an airplane to Bali.',
+                sentenceId: '(Kami pergi ke _______ untuk naik pesawat terbang ke Bali.)',
+                emoji: '🛫', targetWord: 'airport',
+                options: ['harbor', 'bus station', 'airport', 'market'],
+                explanation: '"Airport" artinya bandar udara (bandara), tempat pesawat terbang berangkat dan mendarat.'
+            },
+            {
+                id: 27, paket: 'B', themeId: 'routines', themeName: 'Daily & School',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak ini menjadi kata "Sarapan Pagi"!',
+                emoji: '🥞', clueId: 'Sarapan Pagi', targetWord: 'BREAKFAST',
+                scrambled: ['B', 'K', 'R', 'A', 'E', 'S', 'F', 'T', 'A'],
+                explanation: 'Ejaan yang benar adalah B-R-E-A-K-F-A-S-T (Breakfast = Sarapan).'
+            },
+            {
+                id: 28, paket: 'B', themeId: 'food', themeName: 'Food & Tastes',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak di bawah ini menjadi kata "Wortel"!',
+                emoji: '🥕', clueId: 'Wortel (Sayuran kelinci)', targetWord: 'CARROT',
+                scrambled: ['R', 'C', 'O', 'A', 'T', 'R'],
+                explanation: 'Ejaan yang benar adalah C-A-R-R-O-T (Carrot = Wortel).'
+            },
+            {
+                id: 29, paket: 'B', themeId: 'body', themeName: 'Body & Health',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak berikut menjadi kata "Sakit Kepala"!',
+                emoji: '🤕', clueId: 'Sakit Kepala', targetWord: 'HEADACHE',
+                scrambled: ['H', 'D', 'E', 'A', 'C', 'A', 'E', 'H'],
+                explanation: 'Ejaan yang benar adalah H-E-A-D-A-C-H-E (Headache = Sakit kepala).'
+            },
+            {
+                id: 30, paket: 'B', themeId: 'weather', themeName: 'Clothes & Weather',
+                type: 'scramble', typeLabel: '🔤 Susun Huruf (Spelling)',
+                instruction: 'Susun huruf acak ini menjadi kata "Celana Panjang"!',
+                emoji: '👖', clueId: 'Celana Panjang', targetWord: 'TROUSERS',
+                scrambled: ['T', 'O', 'R', 'S', 'U', 'R', 'E', 'S'],
+                explanation: 'Ejaan yang benar adalah T-R-O-U-S-E-R-S (Trousers = Celana panjang).'
+            }
+        ];
+
+        // =========================================================================
+        // 3. STATE APLIKASI & AUDIO ENGINE (WEB AUDIO + WEB SPEECH API)
+        // =========================================================================
+        let state = {
+            studentName: '',
+            webhookUrl: localStorage.getItem('vocabkids_webhook') || '',
+            sfxEnabled: true,
+            activeThemeIdx: 0,
+            learnSubMode: 'cards',
+            miniQuiz: {
+                questions: [],
+                index: 0,
+                score: 0
+            },
+            mainQuiz: {
+                modeName: '',
+                questions: [],
+                index: 0,
+                score: 0,
+                isAnswered: false,
+                scrambleIndices: [],
+                history: [],
+                startTime: null,
+                timerInterval: null,
+                elapsedSeconds: 0
+            }
+        };
+
+        // Inisialisasi indikator webhook saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            updateWebhookIndicator();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+            }
+        });
+
+        // --- WEB AUDIO API: EFEK SUARA RAMAH ANAK ---
+        let audioCtx = null;
+        function playSoundEffect(type) {
+            if (!state.sfxEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    // Nada ceria naik (C5 -> E5 -> G5)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.09);
+                    osc.frequency.setValueAtTime(783.99, now + 0.18);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+                    osc.start(now);
+                    osc.stop(now + 0.42);
+                } else if (type === 'wrong') {
+                    // Nada lembut turun (E4 -> C4)
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(329.63, now);
+                    osc.frequency.setValueAtTime(261.63, now + 0.14);
+                    gain.gain.setValueAtTime(0.16, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'tap') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'finish') {
+                    // Fanfare singkat
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + i * 0.11);
+                        g.gain.setValueAtTime(0.16, now + i * 0.11);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.35);
+                        o.start(now + i * 0.11);
+                        o.stop(now + i * 0.11 + 0.35);
+                    });
+                }
+            } catch (e) {
+                // Abaikan jika browser membatasi autoplay audio
+            }
+        }
+
+        function toggleSoundEffects() {
+            state.sfxEnabled = !state.sfxEnabled;
+            document.getElementById('sfx-icon').textContent = state.sfxEnabled ? '🔔' : '🔕';
+            document.getElementById('sfx-label').textContent = state.sfxEnabled ? 'Suara On' : 'Suara Off';
+            showToast(state.sfxEnabled ? 'Efek suara diaktifkan' : 'Efek suara dimatikan', state.sfxEnabled ? '🔔' : '🔕');
+        }
+
+        // --- WEB SPEECH API: TEXT-TO-SPEECH (en-US) ---
+        function speakEnglish(text, rate = 0.92) {
+            if (!('speechSynthesis' in window)) {
+                showToast('Perangkat ini belum mendukung fitur suara otomatis.', '🔇');
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = rate;
+            utterance.pitch = 1.05;
+
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
+                                   voices.find(v => v.lang.startsWith('en-US')) ||
+                                   voices.find(v => v.lang.startsWith('en'));
+            if (preferredVoice) utterance.voice = preferredVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- TOAST NOTIFICATION ---
+        let toastTimer = null;
+        function showToast(msg, icon = '💡') {
+            const box = document.getElementById('toast-box');
+            document.getElementById('toast-text').textContent = msg;
+            document.getElementById('toast-icon').textContent = icon;
+            box.classList.remove('hidden');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => box.classList.add('hidden'), 3200);
+        }
+
+        // =========================================================================
+        // 4. PORTAL SISWA & PENGATURAN GURU
+        // =========================================================================
+        function toggleTeacherModal(show) {
+            const modal = document.getElementById('teacher-modal');
+            if (show) {
+                document.getElementById('webhook-url-input').value = state.webhookUrl;
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function saveWebhookSetting() {
+            const url = document.getElementById('webhook-url-input').value.trim();
+            state.webhookUrl = url;
+            localStorage.setItem('vocabkids_webhook', url);
+            updateWebhookIndicator();
+            toggleTeacherModal(false);
+            showToast(url ? 'URL Google Sheets Guru berhasil disimpan!' : 'Pengaturan disimpan tanpa webhook.', '👩‍🏫');
+        }
+
+        function clearWebhookSetting() {
+            document.getElementById('webhook-url-input').value = '';
+            state.webhookUrl = '';
+            localStorage.removeItem('vocabkids_webhook');
+            updateWebhookIndicator();
+            showToast('URL Webhook dihapus.', '🗑️');
+        }
+
+        function updateWebhookIndicator() {
+            const dot = document.getElementById('webhook-indicator');
+            const sendBtn = document.getElementById('btn-send-webhook');
+            if (state.webhookUrl) {
+                dot.classList.remove('bg-slate-300');
+                dot.classList.add('bg-emerald-500');
+                if (sendBtn) sendBtn.classList.remove('hidden');
+            } else {
+                dot.classList.remove('bg-emerald-500');
+                dot.classList.add('bg-slate-300');
+                if (sendBtn) sendBtn.classList.add('hidden');
+            }
+        }
+
+        function enterApp(initialTarget) {
+            const nameVal = document.getElementById('student-name').value.trim();
+            if (!nameVal) {
+                showToast('Tulis nama lengkapmu terlebih dahulu ya!', '✍️');
+                document.getElementById('student-name').focus();
+                return;
+            }
+
+            playSoundEffect('correct');
+            state.studentName = nameVal;
+
+            document.getElementById('header-student-name').textContent = state.studentName;
+
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-app').classList.remove('hidden');
+
+            renderThemeSelector();
+            selectTheme(0);
+
+            if (initialTarget === 'learn') {
+                switchMainTab('learn');
+            } else {
+                switchMainTab('quiz');
+            }
+        }
+
+        function logoutStudent() {
+            stopQuizTimer();
+            document.getElementById('screen-app').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+        }
+
+        function switchMainTab(tabName) {
+            playSoundEffect('tap');
+            ['learn', 'quiz', 'report'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const content = document.getElementById(`tab-content-${t}`);
+                if (t === tabName) {
+                    btn.classList.add('bg-white', 'text-sky-700', 'shadow');
+                    btn.classList.remove('text-sky-100', 'hover:bg-white/10');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('bg-white', 'text-sky-700', 'shadow');
+                    btn.classList.add('text-sky-100', 'hover:bg-white/10');
+                    content.classList.add('hidden');
+                }
+            });
+
+            if (tabName === 'quiz' && document.getElementById('quiz-arena').classList.contains('hidden')) {
+                document.getElementById('quiz-lobby').classList.remove('hidden');
+            }
+        }
+
+        // =========================================================================
+        // 5. MODUL MATERI & FLASHCARDS INTERAKTIF + MINI PRACTICE
+        // =========================================================================
+        function renderThemeSelector() {
+            const container = document.getElementById('theme-selector');
+            container.innerHTML = '';
+            curriculumThemes.forEach((theme, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `theme-pill-${idx}`;
+                btn.onclick = () => selectTheme(idx);
+                btn.className = 'shrink-0 px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm border-2 transition flex items-center gap-1.5';
+                btn.innerHTML = `<span>${theme.icon}</span><span>${theme.shortTitle}</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectTheme(idx) {
+            playSoundEffect('tap');
+            state.activeThemeIdx = idx;
+            const theme = curriculumThemes[idx];
+
+            // Styling tombol tema aktif
+            curriculumThemes.forEach((_, i) => {
+                const pill = document.getElementById(`theme-pill-${i}`);
+                if (i === idx) {
+                    pill.className = 'shrink-0 px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm border-2 border-sky-500 bg-sky-500 text-white shadow-sm flex items-center gap-1.5';
+                } else {
+                    pill.className = 'shrink-0 px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm border-2 border-slate-200 bg-white text-slate-600 hover:border-sky-300 flex items-center gap-1.5';
+                }
+            });
+
+            document.getElementById('active-theme-title').textContent = `${theme.icon} ${theme.title}`;
+            document.getElementById('active-theme-desc').textContent = theme.description;
+            document.getElementById('theme-word-count').textContent = `${theme.words.length} Kosakata`;
+
+            switchLearnSubMode('cards');
+        }
+
+        function switchLearnSubMode(mode) {
+            state.learnSubMode = mode;
+            const btnCards = document.getElementById('submode-btn-cards');
+            const btnMini = document.getElementById('submode-btn-mini');
+            const cardsContainer = document.getElementById('learn-cards-container');
+            const miniContainer = document.getElementById('learn-mini-container');
+
+            if (mode === 'cards') {
+                btnCards.className = 'px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm bg-amber-500 text-white shadow';
+                btnMini.className = 'px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm bg-white text-amber-800 border border-amber-300 hover:bg-amber-100';
+                cardsContainer.classList.remove('hidden');
+                miniContainer.classList.add('hidden');
+                renderFlashcards();
+            } else {
+                btnMini.className = 'px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm bg-amber-500 text-white shadow';
+                btnCards.className = 'px-3.5 py-2 rounded-xl font-display font-extrabold text-xs sm:text-sm bg-white text-amber-800 border border-amber-300 hover:bg-amber-100';
+                cardsContainer.classList.add('hidden');
+                miniContainer.classList.remove('hidden');
+                startMiniPractice();
+            }
+        }
+
+        function renderFlashcards() {
+            const theme = curriculumThemes[state.activeThemeIdx];
+            const container = document.getElementById('learn-cards-container');
+            container.innerHTML = '';
+
+            theme.words.forEach((w) => {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'flip-card h-56 sm:h-60 select-none';
+                cardWrapper.onclick = function(e) {
+                    // Jangan flip jika user menekan tombol audio
+                    if (e.target.closest('button')) return;
+                    playSoundEffect('tap');
+                    this.classList.toggle('flipped');
+                };
+
+                const safeWord = w.en.replace(/'/g, "\\'");
+                const safeSentence = w.exampleEn.replace(/'/g, "\\'");
+
+                cardWrapper.innerHTML = `
+                    <div class="flip-card-inner shadow-md rounded-2xl">
+                        <!-- SISI DEPAN KARTU -->
+                        <div class="flip-card-front bg-white border-2 border-slate-200 hover:border-sky-300 p-4 flex flex-col items-center justify-between text-center">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-slate-400">
+                                <span>Klik untuk arti ↻</span>
+                                <span class="bg-sky-50 text-sky-600 px-2 py-0.5 rounded-md">${w.phonetic}</span>
+                            </div>
+                            <div class="my-1">
+                                <div class="text-5xl sm:text-6xl mb-2">${w.emoji}</div>
+                                <div class="font-display font-black text-xl sm:text-2xl text-slate-800">${w.en}</div>
+                            </div>
+                            <div class="flex gap-2 w-full">
+                                <button type="button" onclick="speakEnglish('${safeWord}', 0.95)"
+                                    class="flex-1 py-2 px-2.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 font-display font-extrabold text-xs flex items-center justify-center gap-1 transition">
+                                    <span>🔊</span> Dengarkan
+                                </button>
+                                <button type="button" onclick="speakEnglish('${safeWord}', 0.6)" title="Suara Pelan"
+                                    class="py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-display font-extrabold text-xs transition">
+                                    🐢
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- SISI BELAKANG KARTU -->
+                        <div class="flip-card-back bg-gradient-to-br from-sky-500 to-blue-600 text-white p-4 flex flex-col justify-between text-left">
+                            <div>
+                                <div class="flex items-center justify-between border-b border-white/20 pb-1.5 mb-2">
+                                    <span class="font-display font-black text-lg">${w.emoji} ${w.en}</span>
+                                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-bold">Arti</span>
+                                </div>
+                                <div class="font-display font-extrabold text-amber-200 text-base sm:text-lg mb-2">
+                                    = ${w.id}
+                                </div>
+                                <div class="bg-white/15 rounded-xl p-2.5 text-xs leading-relaxed">
+                                    <p class="font-bold text-white mb-0.5">"${w.exampleEn}"</p>
+                                    <p class="text-sky-100 italic">${w.exampleId}</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="speakEnglish('${safeSentence}', 0.9)"
+                                class="w-full py-2 px-3 rounded-xl bg-white text-sky-700 hover:bg-sky-50 font-display font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                                <span>🔊</span> Dengar Contoh Kalimat
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cardWrapper);
+            });
+        }
+
+        // --- MINI-PRACTICE PER TEMA (5 SOAL KILAT) ---
+        function startMiniPractice() {
+            const theme = curriculumThemes[state.activeThemeIdx];
+            // Acak dan ambil 5 kata dari tema aktif
+            const shuffled = [...theme.words].sort(() => Math.random() - 0.5).slice(0, 5);
+            state.miniQuiz = {
+                questions: shuffled.map(wordObj => {
+                    const distractors = theme.words
+                        .filter(w => w.en !== wordObj.en)
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 3)
+                        .map(w => w.id);
+                    const options = [wordObj.id, ...distractors].sort(() => Math.random() - 0.5);
+                    return { wordObj, options };
+                }),
+                index: 0,
+                score: 0
+            };
+            renderMiniQuizQuestion();
+        }
+
+        function renderMiniQuizQuestion() {
+            const mq = state.miniQuiz;
+            const body = document.getElementById('mini-quiz-body');
+
+            if (mq.index >= mq.questions.length) {
+                playSoundEffect('finish');
+                body.innerHTML = `
+                    <div class="text-center py-4 animate-pop">
+                        <div class="text-5xl mb-2">🌟</div>
+                        <h4 class="font-display font-black text-xl text-slate-800">Latihan Kilat Selesai!</h4>
+                        <p class="text-sm text-slate-600 mt-1 mb-4">
+                            Kamu menjawab benar <strong>${mq.score} dari 5</strong> kosakata di tema ini!
+                        </p>
+                        <div class="flex gap-2.5 justify-center">
+                            <button onclick="startMiniPractice()" class="py-2.5 px-4 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-display font-extrabold text-xs sm:text-sm">
+                                🔄 Ulangi Latihan Kilat
+                            </button>
+                            <button onclick="switchLearnSubMode('cards')" class="py-2.5 px-4 rounded-xl btn-3d btn-3d-blue text-white font-display font-extrabold text-xs sm:text-sm">
+                                🃏 Kembali ke Kartu
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('mini-progress').textContent = `Soal ${mq.index + 1} / 5`;
+            const current = mq.questions[mq.index];
+            const safeWord = current.wordObj.en.replace(/'/g, "\\'");
+
+            body.innerHTML = `
+                <div class="text-center bg-slate-50 rounded-xl p-4 mb-4 border border-slate-200">
+                    <div class="text-5xl mb-2">${current.wordObj.emoji}</div>
+                    <div class="inline-flex items-center gap-2">
+                        <span class="font-display font-black text-2xl text-sky-700">${current.wordObj.en}</span>
+                        <button type="button" onclick="speakEnglish('${safeWord}')" class="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center">🔊</button>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Pilih arti Bahasa Indonesia yang tepat!</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="mini-options-grid">
+                    ${current.options.map(opt => `
+                        <button type="button" onclick="answerMiniQuiz('${opt.replace(/'/g, "\\'")}', this)"
+                            class="mini-opt-btn p-3 rounded-xl border-2 border-slate-200 hover:border-sky-400 bg-white font-display font-bold text-sm text-slate-700 text-left transition">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function answerMiniQuiz(selected, btnEl) {
+            const mq = state.miniQuiz;
+            const current = mq.questions[mq.index];
+            const isCorrect = selected === current.wordObj.id;
+
+            document.querySelectorAll('.mini-opt-btn').forEach(b => {
+                b.disabled = true;
+                if (b.textContent.trim() === current.wordObj.id) {
+                    b.classList.add('border-emerald-500', 'bg-emerald-100', 'text-emerald-900');
+                } else if (b === btnEl && !isCorrect) {
+                    b.classList.add('border-rose-500', 'bg-rose-100', 'text-rose-900');
+                }
+            });
+
+            if (isCorrect) {
+                mq.score++;
+                playSoundEffect('correct');
+            } else {
+                playSoundEffect('wrong');
+            }
+            speakEnglish(current.wordObj.en);
+
+            setTimeout(() => {
+                mq.index++;
+                renderMiniQuizQuestion();
+            }, 1150);
+        }
+
+        // =========================================================================
+        // 6. BANK LATIHAN SOAL KOMPREHENSIF (30 SOAL)
+        // =========================================================================
+        function startMainQuiz(mode) {
+            playSoundEffect('tap');
+            let selectedQuestions = [];
+            let modeTitle = '';
+
+            if (mode === 'paketA') {
+                selectedQuestions = fullQuizBank.filter(q => q.paket === 'A');
+                modeTitle = 'Paket A: 15 Soal Dasar';
+            } else if (mode === 'paketB') {
+                selectedQuestions = fullQuizBank.filter(q => q.paket === 'B');
+                modeTitle = 'Paket B: 15 Soal Tantangan';
+            } else {
+                selectedQuestions = [...fullQuizBank];
+                modeTitle = 'Paket Lengkap: 30 Soal';
+            }
+
+            state.mainQuiz = {
+                modeName: modeTitle,
+                questions: selectedQuestions,
+                index: 0,
+                score: 0,
+                isAnswered: false,
+                scrambleIndices: [],
+                history: [],
+                startTime: Date.now(),
+                timerInterval: null,
+                elapsedSeconds: 0
+            };
+
+            document.getElementById('quiz-lobby').classList.add('hidden');
+            document.getElementById('quiz-arena').classList.remove('hidden');
+            document.getElementById('quiz-mode-label').textContent = modeTitle;
+            document.getElementById('quiz-live-score').textContent = '0';
+
+            startQuizTimer();
+            renderMainQuestion();
+        }
+
+        function startQuizTimer() {
+            stopQuizTimer();
+            state.mainQuiz.timerInterval = setInterval(() => {
+                state.mainQuiz.elapsedSeconds++;
+                document.getElementById('quiz-timer').textContent = formatTime(state.mainQuiz.elapsedSeconds);
+            }, 1000);
+        }
+
+        function stopQuizTimer() {
+            if (state.mainQuiz.timerInterval) {
+                clearInterval(state.mainQuiz.timerInterval);
+                state.mainQuiz.timerInterval = null;
+            }
+        }
+
+        function formatTime(totalSec) {
+            const mins = Math.floor(totalSec / 60).toString().padStart(2, '0');
+            const secs = (totalSec % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+
+        function renderMainQuestion() {
+            const mq = state.mainQuiz;
+            mq.isAnswered = false;
+            mq.scrambleIndices = [];
+            const q = mq.questions[mq.index];
+
+            // Update Progress Bar
+            const pct = ((mq.index + 1) / mq.questions.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
+            document.getElementById('quiz-counter').textContent = `${mq.index + 1} / ${mq.questions.length}`;
+
+            // Badge Tipe & Tema
+            const typeBadge = document.getElementById('q-type-badge');
+            typeBadge.textContent = q.typeLabel;
+            const badgeColors = {
+                picture: 'bg-amber-100 text-amber-800',
+                meaning: 'bg-emerald-100 text-emerald-800',
+                context: 'bg-sky-100 text-sky-800',
+                scramble: 'bg-purple-100 text-purple-800'
+            };
+            typeBadge.className = `px-3 py-1 rounded-full text-xs font-display font-extrabold ${badgeColors[q.type]}`;
+            document.getElementById('q-theme-badge').textContent = `Tema: ${q.themeName}`;
+            document.getElementById('q-instruction').textContent = q.instruction;
+
+            document.getElementById('q-feedback-box').classList.add('hidden');
+            const promptBox = document.getElementById('q-prompt-box');
+            const answerArea = document.getElementById('q-answer-area');
+            promptBox.innerHTML = '';
+            answerArea.innerHTML = '';
+
+            const safeTarget = q.targetWord.replace(/'/g, "\\'");
+
+            // Render berdasarkan 4 tipe soal
+            if (q.type === 'picture') {
+                promptBox.innerHTML = `
+                    <div class="text-7xl sm:text-8xl my-1 animate-float select-none">${q.emoji}</div>
+                    <div class="mt-3 flex justify-center gap-2">
+                        <button type="button" onclick="speakEnglish('${safeTarget}', 0.95)"
+                            class="px-3.5 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 font-display font-extrabold text-xs flex items-center gap-1.5 transition">
+                            <span>🔊</span> Dengarkan Petunjuk Suara
+                        </button>
+                        <button type="button" onclick="speakEnglish('${safeTarget}', 0.6)"
+                            class="px-2.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-display font-extrabold text-xs">
+                            🐢
+                        </button>
+                    </div>
+                `;
+                renderMCQButtons(q);
+            } else if (q.type === 'meaning') {
+                promptBox.innerHTML = `
+                    <div class="text-xl sm:text-2xl font-display font-black text-emerald-800 mb-1.5">
+                        ${q.promptHighlight}
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500">${q.promptSub}</p>
+                `;
+                renderMCQButtons(q);
+            } else if (q.type === 'context') {
+                promptBox.innerHTML = `
+                    <div class="text-4xl mb-2">${q.emoji}</div>
+                    <div class="text-base sm:text-xl font-display font-extrabold text-slate-800 leading-relaxed">
+                        "${q.sentence}"
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1.5 italic">${q.sentenceId}</p>
+                `;
+                renderMCQButtons(q);
+            } else if (q.type === 'scramble') {
+                promptBox.innerHTML = `
+                    <div class="text-5xl sm:text-6xl mb-2">${q.emoji}</div>
+                    <div class="inline-block bg-purple-100 text-purple-900 px-4 py-1.5 rounded-full font-display font-extrabold text-xs sm:text-sm">
+                        Petunjuk Arti: "${q.clueId}" (${q.targetWord.length} huruf)
+                    </div>
+                `;
+                renderScrambleBuilder(q);
+            }
+        }
+
+        function renderMCQButtons(q) {
+            const answerArea = document.getElementById('q-answer-area');
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mcq-btn w-full p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-400 hover:bg-sky-50/60 text-left font-display font-extrabold text-slate-700 text-sm sm:text-base transition flex items-center gap-3 shadow-sm';
+                btn.dataset.val = opt;
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-xs sm:text-sm font-black shrink-0">${letters[i]}</span>
+                    <span class="flex-1">${opt}</span>
+                `;
+                btn.onclick = () => submitMCQAnswer(opt, btn);
+                grid.appendChild(btn);
+            });
+            answerArea.appendChild(grid);
+        }
+
+        function submitMCQAnswer(selected, clickedBtn) {
+            const mq = state.mainQuiz;
+            if (mq.isAnswered) return;
+            mq.isAnswered = true;
+
+            const q = mq.questions[mq.index];
+            const correctAns = q.correctOption || q.targetWord;
+            const isCorrect = selected === correctAns;
+
+            document.querySelectorAll('.mcq-btn').forEach(btn => {
+                btn.disabled = true;
+                const val = btn.dataset.val;
+                if (val === correctAns) {
+                    btn.classList.remove('border-slate-200', 'bg-white');
+                    btn.classList.add('border-emerald-500', 'bg-emerald-100', 'text-emerald-950');
+                    btn.querySelector('span:first-child').classList.add('bg-emerald-500', 'text-white');
+                } else if (btn === clickedBtn && !isCorrect) {
+                    btn.classList.remove('border-slate-200', 'bg-white');
+                    btn.classList.add('border-rose-500', 'bg-rose-100', 'text-rose-950', 'animate-shake');
+                    btn.querySelector('span:first-child').classList.add('bg-rose-500', 'text-white');
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            processQuestionFeedback(isCorrect, selected, correctAns);
+        }
+
+        // --- WORD BUILDER (SUSUN HURUF) ---
+        function renderScrambleBuilder(q) {
+            const answerArea = document.getElementById('q-answer-area');
+            answerArea.innerHTML = `
+                <div class="bg-purple-50/80 border-2 border-dashed border-purple-300 rounded-2xl p-4 text-center mb-4">
+                    <div class="text-[11px] font-bold text-purple-600 uppercase tracking-wider mb-2">Susunan Hurufmu:</div>
+                    <div id="builder-slots" class="flex flex-wrap justify-center gap-1.5 sm:gap-2 min-h-[44px]"></div>
+                </div>
+                <div id="builder-pool" class="flex flex-wrap justify-center gap-2 mb-4"></div>
+                <div class="flex flex-wrap items-center justify-center gap-2.5">
+                    <button type="button" id="btn-b-undo" onclick="builderUndo()"
+                        class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-display font-bold text-xs sm:text-sm">
+                        ⌫ Hapus 1
+                    </button>
+                    <button type="button" id="btn-b-reset" onclick="builderReset()"
+                        class="px-4 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 font-display font-bold text-xs sm:text-sm">
+                        🔄 Ulangi
+                    </button>
+                    <button type="button" id="btn-b-check" onclick="builderCheck()"
+                        class="px-5 py-2.5 rounded-xl btn-3d btn-3d-green text-white font-display font-extrabold text-xs sm:text-sm">
+                        ✅ Cek Jawaban
+                    </button>
+                </div>
+            `;
+            refreshBuilderUI();
+        }
+
+        function refreshBuilderUI() {
+            const mq = state.mainQuiz;
+            const q = mq.questions[mq.index];
+            const slotsEl = document.getElementById('builder-slots');
+            const poolEl = document.getElementById('builder-pool');
+
+            slotsEl.innerHTML = '';
+            for (let i = 0; i < q.targetWord.length; i++) {
+                const slot = document.createElement('div');
+                const poolIdx = mq.scrambleIndices[i];
+                if (poolIdx !== undefined) {
+                    slot.className = 'w-9 h-10 sm:w-11 sm:h-12 rounded-xl bg-purple-600 text-white font-display font-black text-base sm:text-xl flex items-center justify-center shadow animate-pop';
+                    slot.textContent = q.scrambled[poolIdx];
+                } else {
+                    slot.className = 'w-9 h-10 sm:w-11 sm:h-12 rounded-xl bg-white border-2 border-purple-200 text-purple-300 font-display font-bold text-base flex items-center justify-center';
+                    slot.textContent = '_';
+                }
+                slotsEl.appendChild(slot);
+            }
+
+            poolEl.innerHTML = '';
+            q.scrambled.forEach((char, idx) => {
+                const used = mq.scrambleIndices.includes(idx);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.disabled = used || mq.isAnswered;
+                btn.textContent = char;
+                btn.className = used
+                    ? 'w-10 h-11 sm:w-11 sm:h-12 rounded-xl bg-slate-100 text-slate-300 font-display font-black text-lg border border-slate-200 cursor-not-allowed'
+                    : 'letter-tile w-10 h-11 sm:w-11 sm:h-12 rounded-xl bg-white hover:bg-amber-50 text-slate-800 border-2 border-slate-300 font-display font-black text-lg sm:text-xl cursor-pointer';
+                btn.onclick = () => {
+                    if (!mq.isAnswered && mq.scrambleIndices.length < q.targetWord.length) {
+                        playSoundEffect('tap');
+                        mq.scrambleIndices.push(idx);
+                        refreshBuilderUI();
+                    }
+                };
+                poolEl.appendChild(btn);
+            });
+        }
+
+        function builderUndo() {
+            const mq = state.mainQuiz;
+            if (mq.isAnswered || mq.scrambleIndices.length === 0) return;
+            playSoundEffect('tap');
+            mq.scrambleIndices.pop();
+            refreshBuilderUI();
+        }
+
+        function builderReset() {
+            const mq = state.mainQuiz;
+            if (mq.isAnswered) return;
+            playSoundEffect('tap');
+            mq.scrambleIndices = [];
+            refreshBuilderUI();
+        }
+
+        function builderCheck() {
+            const mq = state.mainQuiz;
+            if (mq.isAnswered) return;
+            const q = mq.questions[mq.index];
+
+            if (mq.scrambleIndices.length < q.targetWord.length) {
+                showToast(`Susun semua ${q.targetWord.length} hurufnya dulu ya!`, '🔤');
+                return;
+            }
+
+            mq.isAnswered = true;
+            const userWord = mq.scrambleIndices.map(idx => q.scrambled[idx]).join('');
+            const isCorrect = userWord === q.targetWord;
+
+            document.getElementById('btn-b-undo').disabled = true;
+            document.getElementById('btn-b-reset').disabled = true;
+            document.getElementById('btn-b-check').disabled = true;
+            refreshBuilderUI();
+
+            const slotsEl = document.getElementById('builder-slots');
+            if (!isCorrect) slotsEl.classList.add('animate-shake');
+            Array.from(slotsEl.children).forEach(s => {
+                s.classList.remove('bg-purple-600');
+                s.classList.add(isCorrect ? 'bg-emerald-500' : 'bg-rose-500');
+            });
+
+            processQuestionFeedback(isCorrect, userWord, q.targetWord);
+        }
+
+        // --- UMPAN BALIK INSTAN ---
+        function processQuestionFeedback(isCorrect, userAnswer, correctAnswer) {
+            const mq = state.mainQuiz;
+            const q = mq.questions[mq.index];
+
+            if (isCorrect) {
+                mq.score += 10;
+                document.getElementById('quiz-live-score').textContent = mq.score;
+                playSoundEffect('correct');
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 28, spread: 50, origin: { y: 0.75 } });
+                }
+            } else {
+                playSoundEffect('wrong');
+            }
+
+            mq.history.push({
+                id: q.id,
+                themeId: q.themeId,
+                themeName: q.themeName,
+                type: q.type,
+                typeLabel: q.typeLabel,
+                instruction: q.instruction,
+                targetWord: q.targetWord,
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer,
+                explanation: q.explanation,
+                isCorrect: isCorrect
+            });
+
+            const fbBox = document.getElementById('q-feedback-box');
+            const fbIcon = document.getElementById('q-fb-icon');
+            const fbTitle = document.getElementById('q-fb-title');
+            const fbDesc = document.getElementById('q-fb-desc');
+            const fbWord = document.getElementById('q-fb-word');
+            const nextBtn = document.getElementById('q-next-btn');
+
+            fbBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-300', 'text-emerald-950', 'bg-rose-50', 'border-rose-300', 'text-rose-950');
+
+            if (isCorrect) {
+                fbBox.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-950');
+                fbIcon.textContent = '🎉';
+                fbTitle.textContent = 'Hebat! Jawabanmu Benar!';
+                fbDesc.textContent = q.explanation;
+            } else {
+                fbBox.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-950');
+                fbIcon.textContent = '💡';
+                fbTitle.textContent = `Kurang tepat! Kunci jawaban: ${correctAnswer}`;
+                fbDesc.textContent = q.explanation;
+            }
+
+            fbWord.textContent = q.targetWord;
+            nextBtn.querySelector('span:first-child').textContent =
+                (mq.index === mq.questions.length - 1) ? 'Selesai & Lihat Rapor 📊' : 'Soal Berikutnya';
+
+            // Putar audio kata target secara otomatis
+            speakEnglish(q.targetWord, 0.92);
+        }
+
+        function speakCurrentQuizWord(rate) {
+            const q = state.mainQuiz.questions[state.mainQuiz.index];
+            if (q) speakEnglish(q.targetWord, rate);
+        }
+
+        function nextMainQuestion() {
+            const mq = state.mainQuiz;
+            if (mq.index < mq.questions.length - 1) {
+                mq.index++;
+                renderMainQuestion();
+            } else {
+                finishMainQuiz();
+            }
+        }
+
+        // =========================================================================
+        // 7. LAPORAN RAPOR, ANALISIS PER TEMA & INTEGRASI GURU
+        // =========================================================================
+        let latestReportData = null;
+
+        function finishMainQuiz() {
+            stopQuizTimer();
+            playSoundEffect('finish');
+
+            const mq = state.mainQuiz;
+            const total = mq.questions.length;
+            const correctCount = mq.history.filter(h => h.isCorrect).length;
+            const finalScore = Math.round((correctCount / total) * 100);
+            const durationFormatted = formatTime(mq.elapsedSeconds);
+
+            // Tentukan Predikat
+            let predicate = 'Keep Practicing!';
+            let stars = '⭐';
+            let badgeIcon = '🌱';
+            if (finalScore >= 85) {
+                predicate = 'Master Explorer!';
+                stars = '⭐⭐⭐';
+                badgeIcon = '🏆';
+                if (typeof confetti === 'function') confetti({ particleCount: 95, spread: 80, origin: { y: 0.6 } });
+            } else if (finalScore >= 65) {
+                predicate = 'Great Learner!';
+                stars = '⭐⭐';
+                badgeIcon = '🌟';
+            }
+
+            // Analisis per 5 Tema
+            const themeStats = curriculumThemes.map(t => {
+                const items = mq.history.filter(h => h.themeId === t.id);
+                const corr = items.filter(h => h.isCorrect).length;
+                const pct = items.length > 0 ? Math.round((corr / items.length) * 100) : 0;
+                return { id: t.id, title: t.shortTitle, icon: t.icon, correct: corr, total: items.length, percent: pct };
+            });
+
+            // Analisis per 4 Tipe Soal
+            const typeDefs = [
+                { key: 'picture', label: '🖼️ Tebak Gambar & Audio' },
+                { key: 'meaning', label: '📖 Arti & Lawan Kata' },
+                { key: 'context', label: '✍️ Kalimat Rumpang' },
+                { key: 'scramble', label: '🔤 Susun Huruf (Spelling)' }
+            ];
+            const typeStats = typeDefs.map(td => {
+                const items = mq.history.filter(h => h.type === td.key);
+                const corr = items.filter(h => h.isCorrect).length;
+                const pct = items.length > 0 ? Math.round((corr / items.length) * 100) : 0;
+                return { key: td.key, label: td.label, correct: corr, total: items.length, percent: pct };
+            });
+
+            latestReportData = {
+                studentName: state.studentName,
+                modeName: mq.modeName,
+                finalScore,
+                correctCount,
+                total,
+                durationFormatted,
+                predicate,
+                themeStats,
+                typeStats,
+                history: mq.history
+            };
+
+            // Reset tampilan arena kuis ke lobby & pindah ke Tab Rapor
+            document.getElementById('quiz-arena').classList.add('hidden');
+            document.getElementById('quiz-lobby').classList.remove('hidden');
+            renderReportView();
+            switchMainTab('report');
+        }
+
+        function renderReportView() {
+            const data = latestReportData;
+            if (!data) return;
+
+            document.getElementById('report-empty-state').classList.add('hidden');
+            document.getElementById('report-filled-state').classList.remove('hidden');
+
+            document.getElementById('rep-badge-icon').textContent = data.finalScore >= 85 ? '🏆' : (data.finalScore >= 65 ? '🌟' : '🌱');
+            document.getElementById('rep-stars').textContent = data.finalScore >= 85 ? '⭐⭐⭐' : (data.finalScore >= 65 ? '⭐⭐' : '⭐');
+            document.getElementById('rep-predicate').textContent = data.predicate;
+            document.getElementById('rep-student-meta').textContent = `${data.studentName} • ${data.modeName}`;
+            document.getElementById('rep-score').textContent = data.finalScore;
+            document.getElementById('rep-stats-sub').textContent = `${data.correctCount}/${data.total} Benar • ⏱️ ${data.durationFormatted}`;
+
+            // Render Grafik Batang per 5 Tema
+            const themeBarsEl = document.getElementById('rep-theme-bars');
+            themeBarsEl.innerHTML = '';
+            let weakestTheme = null;
+            let lowestThemePct = 101;
+
+            data.themeStats.forEach(ts => {
+                if (ts.total > 0 && ts.percent < lowestThemePct) {
+                    lowestThemePct = ts.percent;
+                    weakestTheme = ts;
+                }
+                const barColor = ts.percent >= 80 ? 'bg-emerald-500' : (ts.percent >= 50 ? 'bg-amber-400' : 'bg-rose-500');
+                themeBarsEl.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                            <span>${ts.icon} ${ts.title}</span>
+                            <span>${ts.correct}/${ts.total} (${ts.percent}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                            <div class="${barColor} h-full rounded-full transition-all duration-700" style="width: ${ts.percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render Grafik Batang per 4 Tipe Soal
+            const typeBarsEl = document.getElementById('rep-type-bars');
+            typeBarsEl.innerHTML = '';
+            data.typeStats.forEach(tys => {
+                const barColor = tys.percent >= 80 ? 'bg-sky-500' : (tys.percent >= 50 ? 'bg-indigo-400' : 'bg-rose-500');
+                typeBarsEl.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                            <span>${tys.label}</span>
+                            <span>${tys.correct}/${tys.total} (${tys.percent}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                            <div class="${barColor} h-full rounded-full transition-all duration-700" style="width: ${tys.percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Rekomendasi Belajar Otomatis
+            const recEl = document.getElementById('rep-recommendation');
+            if (data.finalScore === 100) {
+                recEl.innerHTML = `💡 <strong>Analisis Guru:</strong> Luar biasa! <strong>${data.studentName}</strong> menguasai 100% kosakata pada seluruh tema dan kemampuan mengeja.`;
+            } else if (weakestTheme) {
+                recEl.innerHTML = `💡 <strong>Saran Belajar:</strong> <strong>${data.studentName}</strong> disarankan mengulang Flashcards pada <strong>${weakestTheme.icon} ${weakestTheme.title}</strong> (${weakestTheme.percent}%) untuk memperkuat ingatan kosakata pada tema tersebut.`;
+            }
+
+            // Update tombol Webhook jika URL disetel guru
+            updateWebhookIndicator();
+
+            // Render Daftar Review Jawaban
+            const wrongCount = data.history.filter(h => !h.isCorrect).length;
+            document.getElementById('wrong-count-badge').textContent = wrongCount;
+            filterReviewList(wrongCount > 0 ? 'wrong' : 'all');
+        }
+
+        function filterReviewList(filterMode) {
+            const data = latestReportData;
+            if (!data) return;
+
+            const btnWrong = document.getElementById('rev-filter-wrong');
+            const btnAll = document.getElementById('rev-filter-all');
+            if (filterMode === 'wrong') {
+                btnWrong.className = 'px-3 py-1 rounded-lg font-bold bg-rose-500 text-white';
+                btnAll.className = 'px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-600';
+            } else {
+                btnAll.className = 'px-3 py-1 rounded-lg font-bold bg-sky-600 text-white';
+                btnWrong.className = 'px-3 py-1 rounded-lg font-bold bg-rose-100 text-rose-800';
+            }
+
+            const listEl = document.getElementById('rep-review-list');
+            listEl.innerHTML = '';
+
+            const itemsToShow = filterMode === 'wrong'
+                ? data.history.filter(h => !h.isCorrect)
+                : data.history;
+
+            if (itemsToShow.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-6 text-sm text-emerald-700 font-bold bg-emerald-50 rounded-xl">🎉 Hebat! Tidak ada jawaban yang salah!</div>`;
+                return;
+            }
+
+            itemsToShow.forEach((item, idx) => {
+                const safeWord = item.targetWord.replace(/'/g, "\\'");
+                listEl.innerHTML += `
+                    <div class="p-3.5 rounded-xl border ${item.isCorrect ? 'border-emerald-200 bg-emerald-50/40' : 'border-rose-200 bg-rose-50/40'} flex items-center justify-between gap-3">
+                        <div class="text-xs sm:text-sm">
+                            <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                <span class="px-2 py-0.5 rounded-md font-bold text-[11px] ${item.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                    ${item.isCorrect ? '✅ Benar' : '❌ Salah'}
+                                </span>
+                                <span class="text-[11px] font-semibold text-slate-500">${item.themeName} • ${item.typeLabel}</span>
+                            </div>
+                            <div class="font-semibold text-slate-800">
+                                Jawabanmu: <span class="${item.isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-600 line-through'}">${item.userAnswer}</span>
+                                ${!item.isCorrect ? ` • Kunci: <span class="text-emerald-700 font-bold">${item.correctAnswer}</span>` : ''}
+                            </div>
+                            <p class="text-xs text-slate-600 mt-0.5">${item.explanation}</p>
+                        </div>
+                        <button type="button" onclick="speakEnglish('${safeWord}')" title="Dengarkan ${item.targetWord}"
+                            class="shrink-0 w-10 h-10 rounded-xl bg-white border border-slate-200 hover:bg-sky-50 text-sky-600 flex items-center justify-center shadow-sm">
+                            🔊
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function copyReportToClipboard() {
+            const d = latestReportData;
+            if (!d) return;
+
+            const themeLines = d.themeStats.map(t => `- ${t.icon} ${t.title}: ${t.correct}/${t.total} (${t.percent}%)`).join('\n');
+            const reportText =
+`📊 *LAPORAN RAPOR KOSAKATA BAHASA INGGRIS (SD)*
+Nama Siswa : ${d.studentName}
+Paket Kuis : ${d.modeName}
+Nilai Akhir : *${d.finalScore}/100* (${d.correctCount}/${d.total} Benar)
+Predikat : ${d.predicate}
+Waktu : ${d.durationFormatted}
+
+*Rincian Penguasaan Tema:*
+${themeLines}
+
+Dikirim dari aplikasi VocabKids Explorer 🌟`;
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = reportText;
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Laporan Rapor berhasil disalin! Siap ditempel ke WhatsApp Guru.', '📋');
+            } catch (e) {
+                showToast('Gagal menyalin otomatis. Silakan screenshot layar rapor ini.', '📸');
+            }
+            document.body.removeChild(tempArea);
+        }
+
+        async function sendReportToWebhook() {
+            const d = latestReportData;
+            if (!d || !state.webhookUrl) return;
+
+            const btn = document.getElementById('btn-send-webhook');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span><span>Mengirim ke Google Sheets...</span>';
+
+            try {
+                await fetch(state.webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        timestamp: new Date().toISOString(),
+                        studentName: d.studentName,
+                        modeName: d.modeName,
+                        finalScore: d.finalScore,
+                        correctCount: d.correctCount,
+                        totalQuestions: d.total,
+                        duration: d.durationFormatted,
+                        predicate: d.predicate
+                    })
+                });
+                showToast('Nilai berhasil dikirim ke Google Sheets Guru!', '☁️');
+                btn.innerHTML = '<span>✅</span><span>Terkirim ke Google Sheets</span>';
+            } catch (err) {
+                showToast('Gagal mengirim ke server. Gunakan tombol Salin Laporan saja.', '⚠️');
+                btn.disabled = false;
+                btn.innerHTML = '<span>☁️</span><span>Kirim ke Google Sheets Guru</span>';
+            }
+        }
+    </script>
+</body>
+</html>
